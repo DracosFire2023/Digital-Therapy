@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rebuilding Together: A Gentle Guide to Repairing Trust and Connection</title>
+    <title>Rebuilding Together: Interactive Relationship Workbook</title>
     <style>
         :root {
             --primary-color: #5c6b73;
@@ -81,12 +81,21 @@
             margin-top: 0;
             color: var(--primary-color);
         }
-        .prompt-line {
-            border-bottom: 1px dashed #cbd5e1;
-            margin: 1.5rem 0 0.5rem 0;
-            padding-bottom: 0.5rem;
-            color: #718096;
-            font-style: italic;
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin: 0.5rem 0 1rem 0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(92, 107, 115, 0.1);
         }
         table {
             width: 100%;
@@ -109,15 +118,42 @@
             border-radius: 8px;
             margin-bottom: 2rem;
         }
+        .save-bar {
+            position: sticky;
+            top: 1rem;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            z-index: 100;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #434e56;
+        }
+        .save-status {
+            font-size: 0.9rem;
+            color: #718096;
+            font-style: italic;
+        }
         @media print {
-            body {
-                background: #fff;
-                padding: 0;
-            }
-            .container {
-                box-shadow: none;
-                padding: 1rem;
-            }
+            .save-bar { display: none; }
+            body { background: #fff; padding: 0; }
+            .container { box-shadow: none; padding: 1rem; }
         }
     </style>
 </head>
@@ -125,12 +161,17 @@
 
 <div class="container">
 
+    <div class="save-bar">
+        <span class="save-status" id="saveStatus">Your progress saves locally in this browser.</span>
+        <button onclick="saveProgress()">Save Progress</button>
+    </div>
+
     <h1>Rebuilding Together</h1>
     <div class="subtitle">A Gentle Guide to Repairing Trust and Connection After Defensive Breakdowns</div>
 
     <div class="welcome-note">
-        <p><strong>A Note to Partners:</strong> Relationships impacted by defensive, self-protective, or narcissistic patterns often fall into a painful cycle: one partner feels invisible or criticized, while the other feels attacked and shifts into heavy self-protection. Over time, emotional distance grows.</p>
-        <p>Repairing a relationship is not about assigning blame or deciding who was "right." It is about recognizing the old dance you both step into and learning how to step out of it together. This workbook provides gentle frameworks to help both partners feel safe, validated, and truly heard.</p>
+        <p><strong>A Note to Partners:</strong> Relationships impacted by defensive patterns often fall into a painful cycle: one partner feels invisible or criticized, while the other feels attacked and shifts into heavy self-protection.</p>
+        <p>Type your shared reflections into the fields below and click <strong>Save Progress</strong> to store your responses locally in your browser.</p>
     </div>
 
     <div class="diagram">+-------------------------------------------------------+
@@ -156,15 +197,15 @@
 
     <div class="exercise-box">
         <h4>Reflection Exercise 1.1: Tracing Your Conflict Loop</h4>
-        <p>Think of a recent cycle or recurring argument in your relationship and trace how it starts:</p>
-        <p><strong>1. The Trigger / Spark:</strong> What was the initial moment, event, or comment?</p>
-        <div class="prompt-line">Write your reflections here...</div>
         
-        <p><strong>2. Partner A’s Experience (The Hurt/Loneliness):</strong> What vulnerability or unmet need sat at the very root?</p>
-        <div class="prompt-line">Write your reflections here...</div>
+        <label><strong>1. The Trigger / Spark:</strong> What was the initial moment, event, or comment?</label>
+        <textarea id="rel_q1" rows="3" placeholder="Type your reflections here..."></textarea>
+        
+        <label><strong>2. Partner A’s Experience (The Hurt/Loneliness):</strong> What vulnerability or unmet need sat at the very root?</label>
+        <textarea id="rel_q2" rows="3" placeholder="Type your reflections here..."></textarea>
 
-        <p><strong>3. Partner B’s Experience (The Threat/Shield):</strong> What sudden fear of inadequacy or criticism triggered the defense?</p>
-        <div class="prompt-line">Write your reflections here...</div>
+        <label><strong>3. Partner B’s Experience (The Threat/Shield):</strong> What sudden fear of inadequacy or criticism triggered the defense?</label>
+        <textarea id="rel_q3" rows="3" placeholder="Type your reflections here..."></textarea>
     </div>
 
     <h2>Module 2: Honoring Two Realities</h2>
@@ -191,13 +232,15 @@
 
     <div class="exercise-box">
         <h4>Exercise 2.1: The Two Realities Dialogue Template</h4>
-        <p>Pick a past misunderstanding and write out each other's perspective without arguing or invalidating:</p>
-        <p><strong>Partner A’s Emotional Reality:</strong> <em>"When [Event] happened, I felt..."</em></p>
-        <div class="prompt-line">...</div>
-        <p><strong>Partner B’s Emotional Reality:</strong> <em>"When [Event] happened, my internal reaction was..."</em></p>
-        <div class="prompt-line">...</div>
-        <p><strong>Shared Takeaway:</strong> <em>"Even though we experienced this differently, we both care about each other and want to feel..."</em></p>
-        <div class="prompt-line">...</div>
+        
+        <label><strong>Partner A’s Emotional Reality:</strong> <em>"When [Event] happened, I felt..."</em></label>
+        <textarea id="rel_pa" rows="3" placeholder="Partner A's response..."></textarea>
+        
+        <label><strong>Partner B’s Emotional Reality:</strong> <em>"When [Event] happened, my internal reaction was..."</em></label>
+        <textarea id="rel_pb" rows="3" placeholder="Partner B's response..."></textarea>
+        
+        <label><strong>Shared Takeaway:</strong> <em>"Even though we experienced this differently, we both care about each other and want to feel..."</em></label>
+        <textarea id="rel_takeaway" rows="3" placeholder="Shared conclusion..."></textarea>
     </div>
 
     <h2>Module 3: Softening Defenses & Practicing Accountable Apologies</h2>
@@ -213,11 +256,12 @@
 
     <div class="exercise-box">
         <h4>Exercise 3.1: Rewriting an Apology</h4>
-        <p>Think of a past time when an apology fell flat or turned into an argument.</p>
-        <p><strong>The Old Defensive Apology:</strong></p>
-        <div class="prompt-line">Write the old version here...</div>
-        <p><strong>The New Accountable Apology (Focusing on Impact, No "Buts"):</strong></p>
-        <div class="prompt-line">Write the revised version here...</div>
+        
+        <label><strong>The Old Defensive Apology:</strong></label>
+        <textarea id="rel_old_apology" rows="2" placeholder="Write the old version here..."></textarea>
+        
+        <label><strong>The New Accountable Apology (Focusing on Impact, No "Buts"):</strong></label>
+        <textarea id="rel_new_apology" rows="3" placeholder="Write the revised version here..."></textarea>
     </div>
 
     <h2>Module 4: Building a Shared "Safety Agreement"</h2>
@@ -225,20 +269,58 @@
 
     <div class="exercise-box">
         <h4>Our Relationship Safety Agreement</h4>
-        <p>Complete these rules together so both partners feel protected during hard discussions:</p>
-        <p><strong>1. The Pause Word:</strong> If either of us feels our defense shield snapping up, we can say this code word to take a 20-minute break to calm our nervous systems:</p>
-        <div class="prompt-line">Our pause word is: ________________________</div>
         
-        <p><strong>2. The Re-Engagement Promise:</strong> When we take a pause, we promise to return to the conversation within:</p>
-        <div class="prompt-line">Timeframe (e.g., 30 minutes, this evening): ________________________</div>
+        <label><strong>1. The Pause Word:</strong> If either of us feels our defense shield snapping up, we can say this code word to take a 20-minute break:</label>
+        <input type="text" id="rel_pause_word" placeholder="Enter pause word...">
+        
+        <label><strong>2. The Re-Engagement Promise:</strong> When we take a pause, we promise to return to the conversation within:</label>
+        <input type="text" id="rel_reengage" placeholder="e.g., 30 minutes, this evening">
 
-        <p><strong>3. Appreciation Protocol:</strong> Once a week, we will each share one thing we appreciated about how the other handled a challenge or showed care.</p>
+        <label><strong>3. Appreciation Protocol:</strong> Once a week, we will each share one thing we appreciated about how the other handled a challenge:</label>
+        <input type="text" id="rel_appreciation" placeholder="Enter routine detail...">
     </div>
 
     <h2>Moving Forward Together</h2>
     <p>Repairing relational patterns built over years takes patience, grace, and repetition. There will be days when the armor slips back on—when that happens, offer each other patience instead of judgment. Every time you catch the cycle, pause, and choose understanding over defense, you lay another brick in a stronger, safer foundation.</p>
 
 </div>
+
+<script>
+    const STORAGE_KEY = 'relationship_workbook_data';
+
+    function saveProgress() {
+        const data = {};
+        const inputs = document.querySelectorAll('textarea, input[type="text"]');
+        inputs.forEach(input => {
+            if (input.id) {
+                data[input.id] = input.value;
+            }
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        
+        const status = document.getElementById('saveStatus');
+        const now = new Date().toLocaleTimeString();
+        status.textContent = `Progress saved successfully at ${now}!`;
+        setTimeout(() => {
+            status.textContent = 'Your progress saves locally in this browser.';
+        }, 4000);
+    }
+
+    function loadProgress() {
+        const savedData = localStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            const data = JSON.parse(savedData);
+            Object.keys(data).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = data[id];
+                }
+            });
+        }
+    }
+
+    window.onload = loadProgress;
+</script>
 
 </body>
 </html>
