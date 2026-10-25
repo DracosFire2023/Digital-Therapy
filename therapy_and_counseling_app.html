@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindTherapy - Interactive Therapy & Counseling Workspace</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sage: {
+                            50: '#f4f7f4',
+                            100: '#e3ebe3',
+                            200: '#c8dac9',
+                            500: '#698d6c',
+                            600: '#547257',
+                            700: '#435a45',
+                        },
+                        warm: {
+                            50: '#fcfbf9',
+                            100: '#f6f3ee',
+                            200: '#eae3d7',
+                            800: '#5c5243',
+                            900: '#383228',
+                        },
+                        calm: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            500: '#486581',
+                            700: '#243b53',
+                            900: '#102a43',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f6f3ee;
+            color: #383228;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f0f4f8;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row antialiased selection:bg-sage-200">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-white border-b border-warm-200 p-4 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-sage-500 flex items-center justify-center text-white font-bold">M</div>
+            <span class="font-serif text-xl font-bold text-calm-900">MindTherapy</span>
+        </div>
+        <button id="mobileMenuBtn" class="p-2 text-calm-700 hover:bg-warm-100 rounded-lg">
+            <i data-lucide="menu"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-warm-200 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col justify-between md:static md:inset-auto md:h-screen">
+        <div>
+            <!-- App Logo / Title -->
+            <div class="p-6 border-b border-warm-100 hidden md:flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-sage-500 flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                    <i data-lucide="heart-handshake"></i>
+                </div>
+                <div>
+                    <h1 class="font-serif text-xl font-bold text-calm-900 leading-tight">MindTherapy</h1>
+                    <p class="text-xs text-gray-500">Counseling & Education Hub</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1">
+                <button onclick="switchTab('individual')" id="nav-individual" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all bg-sage-50 text-sage-700 border border-sage-200">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                    <span>Individual Therapy</span>
+                </button>
+
+                <button onclick="switchTab('couples')" id="nav-couples" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all text-gray-600 hover:bg-warm-100">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Couples Therapy</span>
+                </button>
+
+                <button onclick="switchTab('workbooks')" id="nav-workbooks" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all text-gray-600 hover:bg-warm-100">
+                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                    <span>Workbooks & Tools</span>
+                </button>
+
+                <button onclick="switchTab('assistant')" id="nav-assistant" class="nav-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-sm transition-all text-gray-600 hover:bg-warm-100">
+                    <i data-lucide="bot" class="w-5 h-5"></i>
+                    <span>AI Case Assistant</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Footer Settings & API Key -->
+        <div class="p-4 border-t border-warm-100 space-y-2">
+            <button onclick="openApiKeyModal()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium text-gray-600 bg-warm-100 hover:bg-warm-200 transition-colors">
+                <span class="flex items-center space-x-2">
+                    <i data-lucide="key" class="w-4 h-4"></i>
+                    <span>API Key Config</span>
+                </span>
+                <span id="apiKeyStatus" class="w-2 h-2 rounded-full bg-red-400"></span>
+            </button>
+            <div class="text-[10px] text-gray-400 text-center pt-2">
+                Psychology Coursework Workspace &bull; Confidential Local Storage
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto h-screen p-4 md:p-8 custom-scrollbar">
+        
+        <!-- API KEY SETTINGS MODAL -->
+        <div id="apiKeyModal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 border border-warm-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-serif text-lg font-bold text-calm-900 flex items-center space-x-2">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-sage-600"></i>
+                        <span>Gemini API Key Configuration</span>
+                    </h3>
+                    <button onclick="closeApiKeyModal()" class="text-gray-400 hover:text-gray-600">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-600 leading-relaxed">
+                    Provide your Google Gemini API key to activate AI-guided counseling prompts and dynamic exercise generation. Your key is stored locally in your browser session.
+                </p>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Google Gemini API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full px-3 py-2 text-sm border border-warm-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sage-500">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button onclick="closeApiKeyModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-gray-600 hover:bg-warm-100">Cancel</button>
+                    <button onclick="saveApiKey()" class="px-4 py-2 rounded-lg text-xs font-medium bg-sage-600 text-white hover:bg-sage-700 shadow-sm">Save Key</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="fixed bottom-4 right-4 z-50 bg-calm-900 text-white px-4 py-3 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 flex items-center space-x-2 text-sm">
+            <i data-lucide="info" class="w-4 h-4 text-sage-200"></i>
+            <span id="toastMessage">Notification message</span>
+        </div>
+
+        <!-- 1. INDIVIDUAL THERAPY HUB -->
+        <section id="tab-individual" class="tab-content space-y-6 max-w-5xl mx-auto">
+            <header class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-sage-600 bg-sage-50 px-2.5 py-1 rounded-md">Individual Track</span>
+                    <h2 class="text-2xl font-serif font-bold text-calm-900 mt-1">Cognitive & Behavioral Personal Care</h2>
+                    <p class="text-sm text-gray-600 mt-1">Self-reflection tools, mood regulation, and individualized psychological exercises.</p>
+                </div>
+                <button onclick="switchTab('workbooks')" class="inline-flex items-center space-x-2 px-4 py-2.5 bg-sage-600 hover:bg-sage-700 text-white rounded-xl text-xs font-medium transition-colors shadow-sm">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    <span>New Thought Record</span>
+                </button>
+            </header>
+
+            <!-- Quick Mood Check & Reflection Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Daily Tracker Card -->
+                <div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-calm-900 text-sm flex items-center space-x-2">
+                            <i data-lucide="smile" class="w-4 h-4 text-sage-600"></i>
+                            <span>Daily Mood Log</span>
+                        </h3>
+                        <span class="text-[10px] bg-warm-100 text-gray-600 px-2 py-0.5 rounded-full">Today</span>
+                    </div>
+                    <div class="space-y-3">
+                        <label class="block text-xs font-medium text-gray-600">Primary Emotion Scale (1-10)</label>
+                        <input type="range" id="indivMoodSlider" min="1" max="10" value="5" class="w-full accent-sage-600" oninput="updateMoodDisplay(this.value)">
+                        <div class="flex justify-between text-[11px] text-gray-400 font-medium">
+                            <span>Distressed (1)</span>
+                            <span id="indivMoodVal" class="text-sage-700 font-bold">5 - Neutral</span>
+                            <span>Thriving (10)</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Emotion Keywords</label>
+                        <input type="text" id="indivMoodTags" placeholder="e.g. Anxious, Hopeful, Overwhelmed" class="w-full text-xs p-2.5 bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-500">
+                    </div>
+                    <button onclick="saveDailyMood()" class="w-full py-2 bg-warm-100 hover:bg-warm-200 text-calm-900 text-xs font-semibold rounded-lg transition-colors">Log Emotion Entry</button>
+                </div>
+
+                <!-- Guided CBT Prompt -->
+                <div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm space-y-4 md:col-span-2">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-calm-900 text-sm flex items-center space-x-2">
+                            <i data-lucide="brain-circuit" class="w-4 h-4 text-sage-600"></i>
+                            <span>Cognitive Reframing Quick-Prompt</span>
+                        </h3>
+                        <button onclick="generateReframingPrompt()" class="text-xs text-sage-600 font-medium hover:underline flex items-center space-x-1">
+                            <i data-lucide="sparkles" class="w-3 h-3"></i>
+                            <span>Ask AI Guidance</span>
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-600">Identify an intrusive or stressful thought you encountered today:</p>
+                    <textarea id="indivThoughtInput" rows="3" placeholder="e.g., 'I failed to complete all my tasks today, so my entire week is ruined.'" class="w-full text-xs p-3 bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-500"></textarea>
+                    
+                    <div id="reframeAIResult" class="hidden p-3 bg-sage-50 border border-sage-200 rounded-xl text-xs text-sage-800 space-y-1">
+                        <div class="font-semibold text-sage-700 flex items-center space-x-1">
+                            <i data-lucide="lightbulb" class="w-3.5 h-3.5"></i>
+                            <span>Balanced Perspective Suggestion:</span>
+                        </div>
+                        <p id="reframeAIText" class="italic"></p>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button onclick="reframeThought()" class="px-4 py-2 bg-calm-700 hover:bg-calm-900 text-white rounded-lg text-xs font-medium transition-colors">Process Reframe</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Individual Recent Entries Stream -->
+            <div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm space-y-4">
+                <h3 class="font-bold text-calm-900 text-sm flex items-center space-x-2">
+                    <i data-lucide="history" class="w-4 h-4 text-sage-600"></i>
+                    <span>Saved Individual Reflections & Logs</span>
+                </h3>
+                <div id="indivLogsContainer" class="space-y-3 text-xs text-gray-500 italic">
+                    No entries logged yet. Complete the mood log or CBT workbooks to store entries here.
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. COUPLES THERAPY HUB -->
+        <section id="tab-couples" class="tab-content hidden space-y-6 max-w-5xl mx-auto">
+            <header class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-calm-500 bg-calm-50 px-2.5 py-1 rounded-md">Couples & Relational Track</span>
+                    <h2 class="text-2xl font-serif font-bold text-calm-900 mt-1">Interpersonal Communication & Connection</h2>
+                    <p class="text-sm text-gray-600 mt-1">Tools based on Gottman Method and Emotionally Focused Therapy (EFT) principles.</p>
+                </div>
+            </header>
+
+            <!-- Couples Tools Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Conflict De-escalation Protocol -->
+                <div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm space-y-4">
+                    <div class="flex items-center space-x-2 text-calm-900 font-bold text-sm">
+                        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-500"></i>
+                        <h3>Conflict De-escalation "Soft Startup"</h3>
+                    </div>
+                    <p class="text-xs text-gray-600">Reframe critical statements into constructive "I-statements" to prevent defensiveness.</p>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-gray-700">1. I feel... (Emotion)</label>
+                        <input type="text" id="couplesEmotion" placeholder="e.g. Unheard and exhausted" class="w-full text-xs p-2 bg-warm-50 border border-warm-200 rounded-lg">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-gray-700">2. About... (Specific Situation, avoid "Always/Never")</label>
+                        <input type="text" id="couplesSituation" placeholder="e.g. When household chores are left for late at night" class="w-full text-xs p-2 bg-warm-50 border border-warm-200 rounded-lg">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-medium text-gray-700">3. I need... (Positive Action Request)</label>
+                        <input type="text" id="couplesNeed" placeholder="e.g. Us to spend 10 minutes planning chores after dinner" class="w-full text-xs p-2 bg-warm-50 border border-warm-200 rounded-lg">
+                    </div>
+
+                    <button onclick="saveCouplesSoftStartup()" class="w-full py-2 bg-calm-700 hover:bg-calm-900 text-white rounded-lg text-xs font-medium transition-colors">Save Structured Expression</button>
+                </div>
+
+                <!-- Appreciation & Gratitude Bank -->
+                <div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-2 text-calm-900 font-bold text-sm">
+                            <i data-lucide="heart" class="w-4 h-4 text-rose-500"></i>
+                            <h3>Relational Gratitude Deposit</h3>
+                        </div>
+                        <p class="text-xs text-gray-600">Nurture emotional bank accounts by documenting positive affirmations and appreciations.</p>
+                        
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Partner Appreciation Note</label>
+                            <textarea id="couplesGratitude" rows="4" placeholder="e.g. 'I really appreciated how you made coffee this morning when you saw I was busy...'" class="w-full text-xs p-3 bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-500"></textarea>
+                        </div>
+                    </div>
+
+                    <button onclick="saveCouplesGratitude()" class="w-full py-2 bg-sage-600 hover:bg-sage-700 text-white rounded-lg text-xs font-medium transition-colors">Record Appreciation</button>
+                </div>
+            </div>
+
+            <!-- Couples Log Display -->
+            <div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm space-y-4">
+                <h3 class="font-bold text-calm-900 text-sm flex items-center space-x-2">
+                    <i data-lucide="folder-heart" class="w-4 h-4 text-sage-600"></i>
+                    <span>Relational Practice Log</span>
+                </h3>
+                <div id="couplesLogsContainer" class="space-y-3 text-xs text-gray-500 italic">
+                    No couples communications recorded yet.
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. INTERACTIVE WORKBOOKS & QUESTIONNAIRES -->
+        <section id="tab-workbooks" class="tab-content hidden space-y-6 max-w-5xl mx-auto">
+            <header class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-sage-600 bg-sage-50 px-2.5 py-1 rounded-md">Psychology Toolkits</span>
+                    <h2 class="text-2xl font-serif font-bold text-calm-900 mt-1">Interactive Clinical Workbooks</h2>
+                    <p class="text-sm text-gray-600 mt-1">Fillable CBT Thought Records, Attachment Check-ins, and Custom AI Worksheets.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="exportWorkbookData()" class="px-3 py-2 bg-warm-100 hover:bg-warm-200 text-calm-900 rounded-xl text-xs font-medium transition-colors flex items-center space-x-1">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        <span>Export JSON</span>
+                    </button>
+                    <button onclick="window.print()" class="px-3 py-2 bg-warm-100 hover:bg-warm-200 text-calm-900 rounded-xl text-xs font-medium transition-colors flex items-center space-x-1">
+                        <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                        <span>Print</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- CBT THOUGHT RECORD WORKBOOK -->
+            <div class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm space-y-6">
+                <div class="border-b border-warm-100 pb-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-serif font-bold text-lg text-calm-900">Standard CBT Thought Record</h3>
+                        <p class="text-xs text-gray-500">Examine thoughts, evaluate cognitive distortion types, and construct balanced evidence.</p>
+                    </div>
+                    <span class="text-xs bg-sage-100 text-sage-700 px-2.5 py-1 rounded-full font-medium">CBT Core</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="space-y-1">
+                        <label class="font-semibold text-gray-700">1. Situation / Trigger</label>
+                        <p class="text-[11px] text-gray-400">Who, what, where, when?</p>
+                        <textarea id="cbtSituation" rows="3" class="w-full p-2.5 bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-500"></textarea>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="font-semibold text-gray-700">2. Automatic Thought(s)</label>
+                        <p class="text-[11px] text-gray-400">What went through your mind? Rate belief (0-100%)</p>
+                        <textarea id="cbtThought" rows="3" class="w-full p-2.5 bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-500"></textarea>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="font-semibold text-gray-700">3. Cognitive Distortion Categories</label>
+                        <p class="text-[11px] text-gray-400">Select applicable thinking errors:</p>
+                        <select id="cbtDistortion" class="w-full p-2.5 bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-500">
+                            <option value="All-or-Nothing Thinking">All-or-Nothing Thinking</option>
+                            <option value="Catastrophizing">Catastrophizing</option>
+                            <option value="Emotional Reasoning">Emotional Reasoning</option>
+                            <option value="Mind Reading">Mind Reading</option>
+                            <option value="Mental Filter">Mental Filter</option>
+                            <option value="'Should' Statements">'Should' / 'Must' Statements</option>
+                            <option value="Personalization">Personalization</option>
+                        </select>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="font-semibold text-gray-700">4. Evidence Against Thought</label>
+                        <p class="text-[11px] text-gray-400">Facts that do not support the automatic thought</p>
+                        <textarea id="cbtEvidence" rows="3" class="w-full p-2.5 bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-500"></textarea>
+                    </div>
+                </div>
+
+                <div class="space-y-1 text-xs">
+                    <label class="font-semibold text-gray-700">5. Alternative / Balanced Thought</label>
+                    <p class="text-[11px] text-gray-400">A realistic, non-distorted perspective</p>
+                    <textarea id="cbtBalanced" rows="2" class="w-full p-2.5 bg-warm-50 border border-warm-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-sage-500"></textarea>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button onclick="clearCBTWorkbook()" class="px-4 py-2 bg-warm-100 hover:bg-warm-200 text-gray-700 rounded-xl text-xs font-medium">Reset Fields</button>
+                    <button onclick="saveCBTWorkbook()" class="px-4 py-2 bg-sage-600 hover:bg-sage-700 text-white rounded-xl text-xs font-medium shadow-sm">Save Thought Record</button>
+                </div>
+            </div>
+
+            <!-- DYNAMIC AI WORKBOOK APPEND AREA -->
+            <div id="dynamicWorkbookContainer" class="space-y-6">
+                <!-- Dynamically generated AI exercises will be appended here -->
+            </div>
+        </section>
+
+        <!-- 4. AI THERAPY ASSISTANT / CASE ASSISTANT -->
+        <section id="tab-assistant" class="tab-content hidden space-y-6 max-w-5xl mx-auto">
+            <header class="bg-white p-6 rounded-2xl border border-warm-200 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-calm-700 bg-calm-50 px-2.5 py-1 rounded-md">Gemini Powered</span>
+                    <h2 class="text-2xl font-serif font-bold text-calm-900 mt-1">AI Therapy & Case Assistant</h2>
+                    <p class="text-sm text-gray-600 mt-1">Reflective dialogue, case analysis, and dynamic DOM workbook generator.</p>
+                </div>
+                <!-- Mode Toggle -->
+                <div class="flex bg-warm-100 p-1 rounded-xl">
+                    <button id="modeChatBtn" onclick="setAIMode('chat')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-white shadow-sm text-calm-900">Conversational Mode</button>
+                    <button id="modeDomBtn" onclick="setAIMode('dom')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-calm-900">Workbook Generator Mode</button>
+                </div>
+            </header>
+
+            <!-- Chat / Assistant Interface -->
+            <div class="bg-white rounded-2xl border border-warm-200 shadow-sm flex flex-col h-[550px]">
+                
+                <!-- Chat Messages Stream -->
+                <div id="chatMessages" class="flex-1 p-6 overflow-y-auto space-y-4 custom-scrollbar text-xs">
+                    <!-- Default Welcome Message -->
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 rounded-full bg-sage-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+                            <i data-lucide="bot" class="w-4 h-4"></i>
+                        </div>
+                        <div class="bg-warm-50 border border-warm-200 rounded-2xl p-4 max-w-2xl text-gray-700 leading-relaxed">
+                            <p class="font-semibold text-calm-900 mb-1">Hello! I am your AI Counseling Assistant.</p>
+                            <p>How can I assist your therapeutic learning today? I can support you in two ways:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1 text-gray-600">
+                                <li><strong>Conversational Mode:</strong> Reflective listening, exploring client scenarios, or roleplaying therapeutic responses.</li>
+                                <li><strong>Workbook Generator Mode:</strong> Request custom exercises (e.g., "Create a boundary-setting worksheet for couples"), and I will inject interactive elements directly into your Workbooks tab!</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Controls -->
+                <div class="p-4 border-t border-warm-200 bg-warm-50 rounded-b-2xl">
+                    <form onsubmit="handleAISubmit(event)" class="flex items-center space-x-2">
+                        <input type="text" id="aiInputPrompt" placeholder="Ask for therapeutic reflection or request a new workbook section..." class="flex-1 px-4 py-3 bg-white border border-warm-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sage-500">
+                        <button type="submit" id="aiSendBtn" class="px-5 py-3 bg-sage-600 hover:bg-sage-700 text-white rounded-xl text-xs font-medium flex items-center space-x-1 shadow-sm transition-colors">
+                            <span>Send</span>
+                            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- STATE MANAGEMENT ---
+        let apiKey = localStorage.getItem('mindtherapy_gemini_key') || '';
+        let aiMode = 'chat'; // 'chat' or 'dom'
+
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            checkApiKeyStatus();
+            loadStoredLogs();
+        });
+
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        });
+
+        // --- NAVIGATION & TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-sage-50', 'text-sage-700', 'border', 'border-sage-200');
+                btn.classList.add('text-gray-600');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            activeBtn.classList.add('bg-sage-50', 'text-sage-700', 'border', 'border-sage-200');
+            activeBtn.classList.remove('text-gray-600');
+            
+            // Close mobile sidebar on selection
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+        }
+
+        // --- API KEY CONFIGURATION ---
+        function openApiKeyModal() {
+            document.getElementById('apiKeyInput').value = apiKey;
+            document.getElementById('apiKeyModal').classList.remove('hidden');
+        }
+
+        function closeApiKeyModal() {
+            document.getElementById('apiKeyModal').classList.add('hidden');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            apiKey = key;
+            localStorage.setItem('mindtherapy_gemini_key', key);
+            checkApiKeyStatus();
+            closeApiKeyModal();
+            showToast('API Key saved successfully.');
+        }
+
+        function checkApiKeyStatus() {
+            const statusDot = document.getElementById('apiKeyStatus');
+            if (apiKey) {
+                statusDot.classList.remove('bg-red-400');
+                statusDot.classList.add('bg-emerald-500');
+            } else {
+                statusDot.classList.remove('bg-emerald-500');
+                statusDot.classList.add('bg-red-400');
+            }
+        }
+
+        // --- TOAST NOTIFICATIONS ---
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- INDIVIDUAL THERAPY HANDLERS ---
+        function updateMoodDisplay(val) {
+            const labelMap = {
+                1: 'Severe Distress', 2: 'Distressed', 3: 'Low', 4: 'Slightly Unsettled',
+                5: 'Neutral', 6: 'Okay', 7: 'Good', 8: 'Very Good', 9: 'Elevated', 10: 'Thriving'
+            };
+            document.getElementById('indivMoodVal').innerText = `${val} - ${labelMap[val] || ''}`;
+        }
+
+        function saveDailyMood() {
+            const val = document.getElementById('indivMoodSlider').value;
+            const tags = document.getElementById('indivMoodTags').value.trim();
+            const entry = {
+                type: 'Mood Log',
+                timestamp: new Date().toLocaleString(),
+                details: `Mood Rating: ${val}/10. Emotions: ${tags || 'None specified'}`
+            };
+            saveToStorage('indiv_logs', entry);
+            document.getElementById('indivMoodTags').value = '';
+            showToast('Daily mood entry saved!');
+            loadStoredLogs();
+        }
+
+        async function reframeThought() {
+            const thought = document.getElementById('indivThoughtInput').value.trim();
+            if (!thought) {
+                showToast('Please enter an automatic thought to reframe.');
+                return;
+            }
+
+            if (!apiKey) {
+                // Fallback client-side mock if no API key
+                displayReframeResult("Cognitive Distortion identified: Magnification. Balanced Reframe: 'While today had challenges, a single difficult day does not define my entire week or long-term progress.'");
+                return;
+            }
+
+            try {
+                showToast('Processing reframe via Gemini...');
+                const prompt = `Act as an empathetic CBT counselor. Reframe the following automatic negative thought into a balanced, compassionate, and realistic perspective: "${thought}". Provide a short, direct answer (2-3 sentences).`;
+                const responseText = await callGeminiAPI(prompt);
+                displayReframeResult(responseText);
+            } catch (err) {
+                showToast('Error calling Gemini API. Check console/key.');
+                console.error(err);
+            }
+        }
+
+        function displayReframeResult(text) {
+            document.getElementById('reframeAIText').innerText = text;
+            document.getElementById('reframeAIResult').classList.remove('hidden');
+        }
+
+        // --- COUPLES THERAPY HANDLERS ---
+        function saveCouplesSoftStartup() {
+            const emotion = document.getElementById('couplesEmotion').value.trim();
+            const situation = document.getElementById('couplesSituation').value.trim();
+            const need = document.getElementById('couplesNeed').value.trim();
+
+            if (!emotion || !situation || !need) {
+                showToast('Please complete all 3 steps of the soft startup.');
+                return;
+            }
+
+            const entry = {
+                type: 'Soft Startup Expression',
+                timestamp: new Date().toLocaleString(),
+                details: `I feel ${emotion} about ${situation}. I need ${need}.`
+            };
+
+            saveToStorage('couples_logs', entry);
+            document.getElementById('couplesEmotion').value = '';
+            document.getElementById('couplesSituation').value = '';
+            document.getElementById('couplesNeed').value = '';
+            showToast('Soft Startup saved to relational practice log.');
+            loadStoredLogs();
+        }
+
+        function saveCouplesGratitude() {
+            const note = document.getElementById('couplesGratitude').value.trim();
+            if (!note) {
+                showToast('Please enter an appreciation note.');
+                return;
+            }
+
+            const entry = {
+                type: 'Partner Gratitude',
+                timestamp: new Date().toLocaleString(),
+                details: note
+            };
+
+            saveToStorage('couples_logs', entry);
+            document.getElementById('couplesGratitude').value = '';
+            showToast('Appreciation recorded.');
+            loadStoredLogs();
+        }
+
+        // --- WORKBOOK HANDLERS ---
+        function saveCBTWorkbook() {
+            const situation = document.getElementById('cbtSituation').value.trim();
+            const thought = document.getElementById('cbtThought').value.trim();
+            const distortion = document.getElementById('cbtDistortion').value;
+            const evidence = document.getElementById('cbtEvidence').value.trim();
+            const balanced = document.getElementById('cbtBalanced').value.trim();
+
+            if (!situation || !thought) {
+                showToast('Please complete at least Situation and Automatic Thought fields.');
+                return;
+            }
+
+            const entry = {
+                type: 'CBT Thought Record',
+                timestamp: new Date().toLocaleString(),
+                details: `Situation: ${situation} | Thought: ${thought} | Distortion: ${distortion} | Evidence: ${evidence} | Balanced: ${balanced}`
+            };
+
+            saveToStorage('indiv_logs', entry);
+            showToast('CBT Thought Record saved!');
+            loadStoredLogs();
+        }
+
+        function clearCBTWorkbook() {
+            document.getElementById('cbtSituation').value = '';
+            document.getElementById('cbtThought').value = '';
+            document.getElementById('cbtEvidence').value = '';
+            document.getElementById('cbtBalanced').value = '';
+        }
+
+        // --- STORAGE HELPERS ---
+        function saveToStorage(key, entry) {
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            existing.unshift(entry);
+            localStorage.setItem(key, JSON.stringify(existing));
+        }
+
+        function loadStoredLogs() {
+            // Individual Logs
+            const indivLogs = JSON.parse(localStorage.getItem('indiv_logs') || '[]');
+            const indivContainer = document.getElementById('indivLogsContainer');
+            if (indivLogs.length === 0) {
+                indivContainer.innerHTML = '<p class="text-xs text-gray-500 italic">No entries logged yet.</p>';
+            } else {
+                indivContainer.innerHTML = indivLogs.map(log => `
+                    <div class="p-3 bg-warm-50 rounded-xl border border-warm-200">
+                        <div class="flex justify-between font-semibold text-calm-900 mb-1">
+                            <span>${log.type}</span>
+                            <span class="text-[10px] text-gray-400 font-normal">${log.timestamp}</span>
+                        </div>
+                        <p class="text-gray-700 font-normal">${log.details}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Couples Logs
+            const couplesLogs = JSON.parse(localStorage.getItem('couples_logs') || '[]');
+            const couplesContainer = document.getElementById('couplesLogsContainer');
+            if (couplesLogs.length === 0) {
+                couplesContainer.innerHTML = '<p class="text-xs text-gray-500 italic">No couples communications recorded yet.</p>';
+            } else {
+                couplesContainer.innerHTML = couplesLogs.map(log => `
+                    <div class="p-3 bg-warm-50 rounded-xl border border-warm-200">
+                        <div class="flex justify-between font-semibold text-calm-900 mb-1">
+                            <span>${log.type}</span>
+                            <span class="text-[10px] text-gray-400 font-normal">${log.timestamp}</span>
+                        </div>
+                        <p class="text-gray-700 font-normal">${log.details}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function exportWorkbookData() {
+            const indiv = JSON.parse(localStorage.getItem('indiv_logs') || '[]');
+            const couples = JSON.parse(localStorage.getItem('couples_logs') || '[]');
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ individualLogs: indiv, couplesLogs: couples }, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "mindtherapy_coursework_export.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        }
+
+        // --- AI ASSISTANT & GEMINI INTEGRATION ---
+        function setAIMode(mode) {
+            aiMode = mode;
+            const chatBtn = document.getElementById('modeChatBtn');
+            const domBtn = document.getElementById('modeDomBtn');
+
+            if (mode === 'chat') {
+                chatBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-white shadow-sm text-calm-900";
+                domBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-calm-900";
+            } else {
+                domBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-white shadow-sm text-calm-900";
+                chatBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:text-calm-900";
+            }
+        }
+
+        async function handleAISubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('aiInputPrompt');
+            const prompt = inputEl.value.trim();
+            if (!prompt) return;
+
+            // Render User Message
+            appendChatMessage('user', prompt);
+            inputEl.value = '';
+
+            if (!apiKey) {
+                appendChatMessage('bot', "Gemini API Key is missing. Please click 'API Key Config' in the bottom sidebar to provide a key for live generation.");
+                return;
+            }
+
+            appendChatMessage('bot', "Thinking...", 'loading-msg');
+
+            try {
+                if (aiMode === 'chat') {
+                    const systemContext = "You are an expert psychological counselor and supervisor. Offer warm, reflective, active-listening responses or case insights based on evidence-based practices (CBT, EFT, Gottman Method). Keep answers concise, clear, and educational.";
+                    const fullPrompt = `${systemContext}\n\nUser Question: ${prompt}`;
+                    const response = await callGeminiAPI(fullPrompt);
+                    removeLoadingMessage();
+                    appendChatMessage('bot', response);
+                } else {
+                    // Dynamic DOM/Workbook Generator Mode
+                    const domPrompt = `You are an interactive HTML generator for a therapy workbook. 
+                    The user requests a custom exercise card: "${prompt}".
+                    Return ONLY valid HTML markup inside a single <div> that contains a styled card using standard Tailwind CSS classes matching a muted warm theme (e.g., bg-white, border border-warm-200, p-6, rounded-2xl). Include text areas or inputs for the user to write answers.
+                    Do NOT wrap in markdown block text (\`\`\`html) or explanation. Return pure HTML.`;
+
+                    let responseHTML = await callGeminiAPI(domPrompt);
+                    // Clean code fence artifacts if present
+                    responseHTML = responseHTML.replace(/```html/g, '').replace(/```/g, '').trim();
+
+                    removeLoadingMessage();
+                    appendChatMessage('bot', `I have generated and added your custom workbook exercise under the Workbooks tab! <button onclick="switchTab('workbooks')" class="underline text-sage-600 font-semibold ml-1">View Workbook</button>`);
+                    
+                    // Inject into DOM
+                    const container = document.getElementById('dynamicWorkbookContainer');
+                    const wrapper = document.createElement('div');
+                    wrapper.innerHTML = responseHTML;
+                    container.appendChild(wrapper);
+                    lucide.createIcons();
+                }
+            } catch (err) {
+                removeLoadingMessage();
+                appendChatMessage('bot', "An error occurred while communicating with the Gemini API. Please check your key and network connection.");
+                console.error(err);
+            }
+        }
+
+        function appendChatMessage(sender, text, extraClass = '') {
+            const container = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex items-start space-x-3 ${sender === 'user' ? 'justify-end' : ''} ${extraClass}`;
+
+            if (sender === 'user') {
+                msgDiv.innerHTML = `
+                    <div class="bg-calm-700 text-white rounded-2xl p-4 max-w-xl text-xs leading-relaxed">
+                        ${text}
+                    </div>
+                `;
+            } else {
+                msgDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-sage-500 flex items-center justify-center text-white font-bold flex-shrink-0">
+                        <i data-lucide="bot" class="w-4 h-4"></i>
+                    </div>
+                    <div class="bg-warm-50 border border-warm-200 rounded-2xl p-4 max-w-xl text-gray-700 leading-relaxed">
+                        ${text}
+                    </div>
+                `;
+            }
+
+            container.appendChild(msgDiv);
+            container.scrollTop = container.scrollHeight;
+            lucide.createIcons();
+        }
+
+        function removeLoadingMessage() {
+            const loading = document.querySelector('.loading-msg');
+            if (loading) loading.remove();
+        }
+
+        // --- GEMINI API FETCH CALL ---
+        async function callGeminiAPI(promptText) {
+            // Updated model endpoint to gemini-3-flash-preview to fix deprecation errors
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: promptText }]
+                }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    const errMsg = errData?.error?.message || `HTTP ${response.status}: ${response.statusText}`;
+                    throw new Error(errMsg);
+                }
+
+                const data = await response.json();
+                const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) {
+                    throw new Error("API returned an empty text payload.");
+                }
+                return text;
+            } catch (err) {
+                console.error("Gemini API Call Exception:", err);
+                showToast(`API Error: ${err.message}`);
+                throw err;
+            }
+        }
+    </script>
+</body>
+</html>
